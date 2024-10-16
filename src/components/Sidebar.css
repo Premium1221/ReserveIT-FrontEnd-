@@ -1,0 +1,108 @@
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 300px; /* Width of the sidebar */
+    background-color: #FFFFFF; /* Set background to white */
+    box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.1); /* Subtle shadow to elevate the sidebar */
+    overflow-y: auto; /* Allow vertical scrolling if content is long */
+    padding: 24px; /* Add padding inside the sidebar */
+    z-index: 999; /* Ensure it's above the main content */
+    transform: translateX(-100%); /* Fully hide the sidebar off-screen */
+    opacity: 0; /* Initially fully transparent */
+    transition: all 0.4s ease-in-out; /* Smooth transition effect */
+    pointer-events: none; /* Prevent interaction when closed */
+}
+
+/* Sidebar open state */
+.sidebar.open {
+    transform: translateX(0); /* Slide it into view */
+    opacity: 1; /* Make it fully opaque */
+    pointer-events: auto; /* Allow interaction when open */
+}
+
+/* Close button */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Sidebar links and buttons */
+.sidebar a,
+.sidebar button {
+    display: block;
+    padding: 15px;
+    text-align: center;
+    font-size: 18px;
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar a:hover,
+.sidebar button:hover {
+    background-color: #f0f0f0;
+    color: #6f42c1;
+}
+
+/* Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+}
+
+.sidebar.open + .overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Sign Up and Log In buttons */
+.signup-btn,
+.login-btn {
+    background-color: #6f42c1;
+    color: white;
+    border: none;
+    margin: 10px auto;
+    padding: 12px;
+    width: 80%;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.signup-btn:hover,
+.login-btn:hover {
+    background-color: #563d7c;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 250px;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .signup-btn,
+    .login-btn {
+        padding: 10px;
+        font-size: 15px;
+    }
+}

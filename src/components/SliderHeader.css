@@ -1,0 +1,24 @@
+/* components/SliderHeader.css */
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: -20px;
+
+}
+
+.slider-header h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.slider-header .see-all {
+    color: #6f42c1;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.slider-header .see-all:hover {
+    color: #563d7c;
+}

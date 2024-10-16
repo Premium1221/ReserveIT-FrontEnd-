@@ -1,0 +1,67 @@
+
+.restaurant-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px;
+    width: 250px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Restaurant image */
+.restaurant-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+/* Restaurant details section */
+.restaurant-details {
+    padding: 10px;
+}
+
+/* Restaurant name */
+.restaurant-name {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 0;
+}
+
+/* Cuisine type */
+.restaurant-cuisine {
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: 5px;
+}
+
+/* Rating */
+.restaurant-rating {
+    font-size: 0.9rem;
+    margin: 5px 0;
+}
+
+/* Reservation button */
+.reservation-button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border: none;
+    background-color: #6f42c1;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.reservation-button:hover {
+    background-color: #563d7c;
+}
+
+/* Hover effect for the card */
+.restaurant-card {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
