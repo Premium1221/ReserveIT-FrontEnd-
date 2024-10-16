@@ -16,7 +16,7 @@ function App() {
     useEffect(() => {
         const fetchRestaurants = async () => {
             try {
-                // Fetch restaurants from the backend API
+                // Fetch restaurants from the backen API
                 const response = await fetch('http://localhost:8080/api/companies'); // Update with your actual backend endpoint
                 const data = await response.json();
 
