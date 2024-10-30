@@ -8,6 +8,7 @@ import "slick-carousel/slick/slick-theme.css";
 import leftArrow from '../assets/left-arrow.png';
 import rightArrow from '../assets/right-arrow.png';
 
+// Arrow components for slider
 const NextArrow = ({ className, onClick }) => {
     return (
         <div className={className} onClick={onClick}>
@@ -24,7 +25,7 @@ const PrevArrow = ({ className, onClick }) => {
     );
 };
 
-// Ensure onClick is passed by react-slick
+// PropTypes for arrows
 NextArrow.propTypes = {
     className: PropTypes.string,
     onClick: PropTypes.func.isRequired,
@@ -35,15 +36,15 @@ PrevArrow.propTypes = {
     onClick: PropTypes.func.isRequired,
 };
 
-const RestaurantSlider = ({ restaurants }) => {
+const RestaurantSlider = ({ restaurants, onMakeReservation }) => {
     const sliderSettings = {
         dots: false,
         infinite: true,
         speed: 500,
         slidesToShow: 4,
         slidesToScroll: 1,
-        nextArrow: <NextArrow />,  // Just provide the component, react-slick handles onClick
-        prevArrow: <PrevArrow />,  // Just provide the component, react-slick handles onClick
+        nextArrow: <NextArrow />,
+        prevArrow: <PrevArrow />,
         responsive: [
             {
                 breakpoint: 768,
@@ -60,7 +61,11 @@ const RestaurantSlider = ({ restaurants }) => {
             {restaurants.length > 0 ? (
                 <Slider {...sliderSettings}>
                     {restaurants.map((restaurant, index) => (
-                        <RestaurantCard key={index} restaurant={restaurant} />
+                        <RestaurantCard
+                            key={index}
+                            restaurant={restaurant}
+                            onMakeReservation={() => onMakeReservation(restaurant)} // Pass down function with restaurant info
+                        />
                     ))}
                 </Slider>
             ) : (
@@ -70,17 +75,21 @@ const RestaurantSlider = ({ restaurants }) => {
     );
 };
 
+// PropTypes for RestaurantSlider
 RestaurantSlider.propTypes = {
     restaurants: PropTypes.arrayOf(
         PropTypes.shape({
+            id: PropTypes.string.isRequired, // Ensure ID is passed for reservation
             name: PropTypes.string.isRequired,
-            cuisine: PropTypes.string.isRequired,
-            rating: PropTypes.number.isRequired,
-            image: PropTypes.string.isRequired,
-            time: PropTypes.string.isRequired,
-            offer: PropTypes.string,
+            address: PropTypes.string,
+            phone: PropTypes.string,
+            email: PropTypes.string,
+            rating: PropTypes.number,
+            tags: PropTypes.arrayOf(PropTypes.string),
+            pictureUrl: PropTypes.string,
         })
     ).isRequired,
+    onMakeReservation: PropTypes.func.isRequired, // Add prop type for the callback
 };
 
 export default RestaurantSlider;

@@ -22,7 +22,7 @@ const MyReservations = () => {
                 {reservations.map((reservation, index) => (
                     <li key={index}>
                         {reservation.customerName} -
-                        {reservation.company ? reservation.company.name : 'Unknown Company'} -
+                        {reservation.companyName} -
                         {reservation.numberOfPeople} people on {reservation.reservationDate}
                     </li>
                 ))}

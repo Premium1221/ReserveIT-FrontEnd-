@@ -9,14 +9,19 @@ const ReservationModal = ({ restaurant, isOpen, onClose, onSubmit }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const reservation = {
-            restaurant: restaurant.name,
+
+        // Prepare the reservation data
+        const reservationData = {
             customerName,
             reservationDate,
             numberOfPeople,
         };
-        onSubmit(reservation);
-        onClose();
+
+        // Log to check if handleSubmit is triggered
+        console.log("Submitting reservation:", reservationData);
+
+        // Call the onSubmit function passed from parent
+        onSubmit(reservationData);
     };
 
     if (!isOpen) return null;
@@ -24,6 +29,7 @@ const ReservationModal = ({ restaurant, isOpen, onClose, onSubmit }) => {
     return (
         <div className="modal-overlay">
             <div className="modal-content">
+                <button className="close-button" onClick={onClose}>&times;</button>
                 <h2>Make a Reservation at {restaurant.name}</h2>
                 <form onSubmit={handleSubmit}>
                     <input
@@ -48,7 +54,6 @@ const ReservationModal = ({ restaurant, isOpen, onClose, onSubmit }) => {
                         required
                     />
                     <button type="submit">Confirm Reservation</button>
-                    <button type="button" onClick={onClose}>Cancel</button>
                 </form>
             </div>
         </div>
@@ -57,6 +62,7 @@ const ReservationModal = ({ restaurant, isOpen, onClose, onSubmit }) => {
 
 ReservationModal.propTypes = {
     restaurant: PropTypes.shape({
+        id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
     }).isRequired,
     isOpen: PropTypes.bool.isRequired,

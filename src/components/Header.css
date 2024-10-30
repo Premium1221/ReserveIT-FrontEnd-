@@ -111,3 +111,16 @@
     color: #ffffff;
     border-color: #6f42c1;
 }
+/* Header.css */
+.demo-link {
+    margin-right: 10px;
+    font-size: 16px;
+    color: #333;
+    text-decoration: none;
+}
+
+.demo-link:hover {
+    text-decoration: underline;
+    color: #6f42c1; /* Example hover color */
+}
+

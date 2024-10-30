@@ -1,0 +1,19 @@
+.table-map-demo {
+    text-align: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.table-map-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    background-color: #f9f9f9;
+    width: 850px; /* Slightly larger than map dimensions */
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 8px;
+}

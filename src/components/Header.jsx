@@ -1,8 +1,7 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';  // Import Link for navigation
 import Sidebar from './Sidebar';
 import './Header.css';
-
 
 const Header = () => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -19,7 +18,9 @@ const Header = () => {
                     ☰
                 </button>
                 <div className="logo">
-                    <h1>ReserveIT</h1>
+                    <Link to="/">  {/* Link to home page */}
+                        <h1>ReserveIT</h1>
+                    </Link>
                 </div>
             </div>
 
@@ -29,11 +30,13 @@ const Header = () => {
             </div>
 
             <div className="account-controls">
+                {/* Link to the TableMapDemo page */}
+                <Link to="/table-map-demo" className="demo-link">Table Map Demo</Link>
+
                 {isLoggedIn ? (
                     <button className="logout-button" onClick={() => setIsLoggedIn(false)}>Log Out</button>
                 ) : (
                     <>
-
                         <Link to="/login" className="login-button">Log In</Link>
                         <Link to="/register" className="signup-button">Sign Up</Link>
                     </>
