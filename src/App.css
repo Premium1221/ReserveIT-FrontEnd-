@@ -1,77 +1,107 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+#root {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 body {
-  background: #FFFFFF;
-  color: #000000;
-  font-family: system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  background: #f8f9fa;
+  color: #333;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-html {
-  font-family: sans-serif;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+/* Main container */
+.app-container {
+  width: 100%;
+  min-height: 100vh;
 }
 
-/* Remove flex-wrap and let the slider control the layout */
-.restaurant-list {
+/* Main content area */
+.main-content {
+  max-width: 1200px;
+  margin: 80px auto 0;
   padding: 20px;
-  margin: 0 auto;
-  max-width: 1280px;
 }
 
-/* Restaurant Card */
-.restaurant-card {
+/* Restaurant sections */
+.restaurant-section {
+  margin-bottom: 40px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Loading and error states */
+.loading-container,
+.error-container {
   display: flex;
   flex-direction: column;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  overflow: hidden;
-  margin: 20px;
-  width: 300px;
-  background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 20px;
 }
 
-.next-arrow, .prev-arrow {
-  background-color: white;
-  color: black;
-  border: none;
-  font-size: 2rem;
-  padding: 10px;
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #6f42c1;
   border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  color: #dc3545;
+  margin-bottom: 20px;
+}
+
+.retry-button {
+  padding: 10px 20px;
+  background-color: #6f42c1;
+  color: white;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
-  position: absolute;
-  top: 50%;
-  z-index: 2;
-  transform: translateY(-50%);
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);  /* Subtle shadow */
 }
 
-.next-arrow {
-  right: -30px;
+.retry-button:hover {
+  background-color: #563d7c;
 }
 
-.prev-arrow {
-  left: -30px;
+/* No restaurants message */
+.no-restaurants {
+  text-align: center;
+  padding: 40px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.next-arrow:hover, .prev-arrow:hover {
-  background-color: #f0f0f0;
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 15px;
+  }
+
+  .restaurant-section {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
 }

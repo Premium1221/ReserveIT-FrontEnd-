@@ -1,0 +1,142 @@
+.admin-dashboard {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.dashboard-header h1 {
+    font-size: 24px;
+    color: #333;
+}
+
+.tab-controls {
+    display: flex;
+    gap: 12px;
+}
+
+.tab-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tab-button.active {
+    background: #6f42c1;
+    color: white;
+}
+
+.controls {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    flex: 1;
+}
+
+.search-bar input {
+    border: none;
+    outline: none;
+    margin-left: 8px;
+    width: 100%;
+}
+
+.refresh-button,
+.add-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-button {
+    background: #6f42c1;
+    color: white;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.item-card {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.item-header {
+    margin-bottom: 12px;
+}
+
+.item-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.item-email {
+    color: #666;
+    font-size: 14px;
+}
+
+.item-details {
+    margin-bottom: 16px;
+}
+
+.item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.edit-button,
+.delete-button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-button {
+    background: #f0f0f0;
+}
+
+.delete-button {
+    background: #dc3545;
+    color: white;
+}
+
+.loading,
+.error {
+    text-align: center;
+    padding: 24px;
+}
+
+.error {
+    color: #dc3545;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}

@@ -4,15 +4,13 @@
     align-items: center;
     padding: 10px 20px;
     background-color: #ffffff;
-    border-bottom: 1px solid #eee;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    box-sizing: border-box;
     height: 60px;
+    width: 100%;
+    position: relative;
+    box-shadow: none;
+    border-bottom: 1px solid #eee;
 }
+
 
 .menu-logo {
     display: flex;
@@ -21,12 +19,22 @@
 
 /* Hamburger menu styling */
 .hamburger-menu {
-    font-size: 30px;
     background: none;
     border: none;
+    font-size: 24px;
     cursor: pointer;
-    color: black;
-    margin-right: 10px;
+    padding: 8px 12px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.hamburger-menu:hover {
+    color: #6f42c1;
+}
+
+.hamburger-menu:focus {
+    outline: none;
 }
 
 /* Logo styling */

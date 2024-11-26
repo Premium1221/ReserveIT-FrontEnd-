@@ -1,112 +1,80 @@
-import { useState, useEffect } from 'react';
 import { Routes, Route, BrowserRouter as Router } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import { AuthProvider } from './context/AuthContext';
+
+// Components
 import Header from './components/Header';
-import RestaurantSlider from './components/RestaurantSlider';
-import SliderHeader from './components/SliderHeader';
-import Login from './pages/LoginForm.jsx';
-import Register from './pages/RegisterForm.jsx';
-import MyReservations from "./pages/MyReservations.jsx";
-import ReservationModal from './components/ReservationModal'; // Import the modal component
+import ProtectedRoute from './components/ProtectedRoute';
+
+// Pages
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginForm';
+import RegisterPage from './pages/RegisterForm';
+import MyReservationsPage from "./pages/MyReservations";
 import TableMapDemo from './pages/TableMapDemo';
-import axios from 'axios';
+import AdminDashboard from './pages/AdminDashboard';
+import RestaurantDashboard from './pages/RestaurantDashboard';
+
+// Styles
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 function App() {
-    const [restaurants, setRestaurants] = useState([]);
-    const [popularRestaurants, setPopularRestaurants] = useState([]);
-    const [newRestaurants, setNewRestaurants] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false); // Modal open state
-    const [selectedRestaurant, setSelectedRestaurant] = useState(null); // Selected restaurant for modal
-
-    useEffect(() => {
-        const fetchRestaurants = async () => {
-            try {
-                const response = await fetch('http://localhost:8080/api/companies'); // Update with your actual backend endpoint
-                const data = await response.json();
-
-                setRestaurants(data); // All restaurants
-                setPopularRestaurants(data.slice(0, 3));
-                setNewRestaurants(data.slice(3, 6)); // New restaurants (example logic)
-            } catch (error) {
-                console.error("Failed to fetch restaurants:", error);
-            }
-        };
-
-        fetchRestaurants();
-    }, []);
-
-    // Open modal and set selected restaurant
-    const handleOpenModal = (restaurant) => {
-        setSelectedRestaurant(restaurant);
-        setIsModalOpen(true);
-    };
-
-    // Close modal
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setSelectedRestaurant(null);
-    };
-
-    // Handle reservation submission
-    const handleReservationSubmit = (reservationData) => {
-        axios.post('http://localhost:8080/api/reservations', {
-            ...reservationData,
-            companyId: selectedRestaurant.id
-        })
-            .then(() => {
-                alert("Reservation made successfully!"); // Use alert to indicate success
-                setIsModalOpen(false); // Close modal on success
-            })
-            .catch(() => {
-                alert("Failed to make a reservation.");
-            });
-    };
-
     return (
-        <Router>
-            <Header />
-            <Routes>
-                <Route
-                    path="/"
-                    element={
-                        <>
-                            <SliderHeader title="Today's offers" link="#see-all" />
-                            <RestaurantSlider
-                                restaurants={restaurants}
-                                onMakeReservation={handleOpenModal} // Pass function to open modal
-                            />
+        <AuthProvider>
+            <Router>
+                <div className="app-container">
+                    <Header />
+                    <main className="main-content">
+                        <Routes>
+                            {/* Public Routes */}
+                            <Route path="/" element={<HomePage />} />
+                            <Route path="/login" element={<LoginPage />} />
+                            <Route path="/register" element={<RegisterPage />} />
+                            <Route path="/table-map-demo" element={<TableMapDemo />} />
 
-                            <SliderHeader title="Popular Restaurants" link="#see-all" />
-                            <RestaurantSlider
-                                restaurants={popularRestaurants}
-                                onMakeReservation={handleOpenModal}
+                            {/* Protected Routes */}
+                            <Route
+                                path="/my-reservations"
+                                element={
+                                    <ProtectedRoute allowedRoles={['CUSTOMER', 'ADMIN']}>
+                                        <MyReservationsPage />
+                                    </ProtectedRoute>
+                                }
                             />
-
-                            <SliderHeader title="New Arrivals" link="#see-all" />
-                            <RestaurantSlider
-                                restaurants={newRestaurants}
-                                onMakeReservation={handleOpenModal}
+                            <Route
+                                path="/admin-dashboard"
+                                element={
+                                    <ProtectedRoute allowedRoles={['ADMIN']}>
+                                        <AdminDashboard />
+                                    </ProtectedRoute>
+                                }
                             />
-                        </>
-                    }
-                />
-                <Route path="/my-reservations" element={<MyReservations />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                {/* Add the route for the TableMapDemo page */}
-                <Route path="/table-map-demo" element={<TableMapDemo />} />
-            </Routes>
+                            <Route
+                                path="/restaurant-dashboard"
+                                element={
+                                    <ProtectedRoute allowedRoles={['MANAGER','ADMIN']}>
+                                        <RestaurantDashboard />
+                                    </ProtectedRoute>
+                                }
+                            />
+                        </Routes>
+                    </main>
 
-            {/* Render ReservationModal if a restaurant is selected */}
-            {isModalOpen && selectedRestaurant && (
-                <ReservationModal
-                    restaurant={selectedRestaurant}
-                    isOpen={isModalOpen}
-                    onClose={handleCloseModal}
-                    onSubmit={handleReservationSubmit}
-                />
-            )}
-        </Router>
+                    <ToastContainer
+                        position="top-right"
+                        autoClose={3000}
+                        hideProgressBar={false}
+                        newestOnTop
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                    />
+                </div>
+            </Router>
+        </AuthProvider>
     );
 }
 
