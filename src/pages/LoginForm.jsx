@@ -13,6 +13,7 @@ const LoginForm = () => {
     const location = useLocation();
     const { login } = useAuth();
 
+    // Redirect location after login
     const from = location.state?.from?.pathname || '/';
 
     const handleSubmit = async (e) => {
@@ -24,12 +25,15 @@ const LoginForm = () => {
 
             if (result.success) {
                 toast.success('Welcome back!');
-                navigate(from, { replace: true });
+                setTimeout(() => {
+                    navigate(from, { replace: true });
+                }, 100);
             } else {
-                toast.error(result.error);
+                toast.error(result.error || 'Invalid login credentials.');
             }
         } catch (error) {
-            toast.error('Login failed. Please try again.');
+            console.error('Login failed:', error);
+            toast.error('Something went wrong. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -38,23 +42,33 @@ const LoginForm = () => {
     return (
         <div className="auth-container">
             <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={loading}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    disabled={loading}
-                />
+            <form onSubmit={handleSubmit} aria-label="Login Form">
+                <div className="form-group">
+                    <label htmlFor="email">Email</label>
+                    <input
+                        id="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        disabled={loading}
+                        autoComplete="email"
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="password">Password</label>
+                    <input
+                        id="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        disabled={loading}
+                        autoComplete="current-password"
+                    />
+                </div>
                 <button
                     type="submit"
                     className="auth-button"
@@ -64,7 +78,10 @@ const LoginForm = () => {
                 </button>
             </form>
             <div className="auth-footer">
-                <p>Don&#39;t have an account? <a href="/register">Register</a></p>
+                <p>
+                    Don&#39;t have an account?{' '}
+                    <a href="/register">Register</a>
+                </p>
             </div>
         </div>
     );

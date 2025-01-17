@@ -1,19 +1,18 @@
 import PropTypes from 'prop-types';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import './ErrorMessage.css';
 
-const ErrorMessage = ({ message, onRetry }) => {
+const ErrorDisplay = ({ message, onRetry }) => {
     return (
         <div className="error-container">
             <div className="error-content">
-                <AlertCircle size={32} className="error-icon" />
+                <AlertCircle className="error-icon" />
                 <p className="error-message">{message}</p>
                 {onRetry && (
                     <button
                         onClick={onRetry}
                         className="retry-button"
                     >
-                        <RefreshCw size={16} />
                         Try Again
                     </button>
                 )}
@@ -22,9 +21,13 @@ const ErrorMessage = ({ message, onRetry }) => {
     );
 };
 
-ErrorMessage.propTypes = {
+ErrorDisplay.propTypes = {
     message: PropTypes.string.isRequired,
-    onRetry: PropTypes.func
+    onRetry: PropTypes.func,
 };
 
-export default ErrorMessage;
+ErrorDisplay.defaultProps = {
+    onRetry: null,
+};
+
+export default ErrorDisplay;

@@ -65,7 +65,7 @@ const MyReservations = () => {
             if (showRefreshIndicator) setIsRefreshing(true);
             setError(null);
 
-            const response = await api.get('/reservations');
+            const response = await api.get('/reservations/my-reservations');
             const sortedReservations = response.data
                 .sort((a, b) => new Date(b.reservationDate) - new Date(a.reservationDate));
 

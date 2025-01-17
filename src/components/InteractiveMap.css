@@ -1,0 +1,15 @@
+/* InteractiveMap.css */
+
+.interactive-map-container {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.map-wrapper {
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background-color: #f9fafb;
+    padding: 1rem;
+}

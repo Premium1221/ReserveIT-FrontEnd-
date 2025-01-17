@@ -20,7 +20,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
         const menuItems = [];
 
-        // Common items for all authenticated users
         menuItems.push(
             <Link
                 key="home"
@@ -62,6 +61,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 menuItems.push(
                     <Link key="reservations" to="/my-reservations" onClick={toggleSidebar}>
                         My Reservations
+                    </Link>
+                );
+                break;
+
+            case 'STAFF':
+                menuItems.push(
+                    <Link key="staff" to="/staff-dashboard" onClick={toggleSidebar}>
+                        Staff Dashboard
                     </Link>
                 );
                 break;

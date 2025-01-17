@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from './Sidebar';
 import './Header.css';
+import NotificationDropdown from "@/components/NotificationDropdown.jsx";
+
 
 const Header = () => {
     const { isAuthenticated, user, logout } = useAuth();
@@ -37,12 +39,16 @@ const Header = () => {
                 <div className="account-controls">
                     {isAuthenticated ? (
                         <>
+                            {(user.role === 'STAFF' || user.role === 'MANAGER') && (
+                                <NotificationDropdown
+                                    restaurantId={user.companyId}
+                                    onTableUpdate={() => {
+                                    }} // You can handle global table updates here if needed
+                                />
+                            )}
                             <span>Welcome, {user.email}</span>
                             <span>Role: {user.role}</span>
-                            <button
-                                className="logout-button"
-                                onClick={logout}
-                            >
+                            <button className="logout-button" onClick={logout}>
                                 Log Out
                             </button>
                         </>

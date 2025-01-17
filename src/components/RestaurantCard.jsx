@@ -1,50 +1,54 @@
-import { useState } from 'react';
-import PropTypes from 'prop-types';
-import { Heart } from 'lucide-react';
-import './RestaurantCard.css';
+import { useState } from "react";
+import { Heart, Map } from "lucide-react";
+import PropTypes from "prop-types";
+import {Link, useNavigate} from "react-router-dom";
+import "./RestaurantCard.css";
+import {useAuth} from "@/context/AuthContext.jsx";
+import {toast} from "react-toastify"; // Ensure you import the CSS file
 
-const RestaurantCard = ({ restaurant, onMakeReservation, onLike, initialLiked = false }) => {
+const RestaurantCard = ({ restaurant, onLike, initialLiked = false }) => {
     const [isLiked, setIsLiked] = useState(initialLiked);
-    const [isAnimating, setIsAnimating] = useState(false);
-
-    const {
-        name,
-        rating = 0,
-        pictureUrl = '/default-restaurant.jpg',
-        address,
-        categories = []
-    } = restaurant;
+    const navigate = useNavigate();
+    const { isAuthenticated, user } = useAuth();
 
     const handleLike = async () => {
-        setIsAnimating(true);
         setIsLiked(!isLiked);
-
-        try {
-            if (onLike) {
-                await onLike(restaurant.id, !isLiked);
-            }
-        } catch (error) {
-            // Revert the like state if the API call fails
-            setIsLiked(isLiked);
-            console.error('Failed to update like status:', error);
+        if (onLike) {
+            await onLike(restaurant.id, !isLiked);
+        }
+    };
+    const handleViewTables = () => {
+        if (!isAuthenticated) {
+            toast.error("Please log in to view table availability");
+            navigate("/login", {
+                state: {
+                    returnUrl: `/restaurant/${restaurant.id}/tables`,
+                    message: "Please log in to view table availability"
+                }
+            });
+            return;
         }
 
-        // Reset animation after 300ms
-        setTimeout(() => setIsAnimating(false), 300);
+        if (user?.role !== 'CUSTOMER') {
+            toast.error("Only customers can view table availability");
+            return;
+        }
+
+        navigate(`/restaurant/${restaurant.id}/tables`);
     };
 
     return (
         <div className="restaurant-card">
             <div className="restaurant-card-image">
                 <img
-                    src={pictureUrl}
-                    alt={name}
+                    src={restaurant.pictureUrl || "/default-restaurant.jpg"}
+                    alt={restaurant.name}
                     className="card-image"
                 />
                 <button
-                    className={`like-button ${isLiked ? 'liked' : ''} ${isAnimating ? 'animate' : ''}`}
+                    className="like-button"
                     onClick={handleLike}
-                    aria-label={isLiked ? 'Unlike restaurant' : 'Like restaurant'}
+                    aria-label={isLiked ? "Unlike restaurant" : "Like restaurant"}
                 >
                     <Heart
                         className="heart-icon"
@@ -52,30 +56,31 @@ const RestaurantCard = ({ restaurant, onMakeReservation, onLike, initialLiked = 
                         color={isLiked ? "#ef4444" : "#ffffff"}
                     />
                 </button>
-                {rating > 0 && (
+                {restaurant.rating > 0 && (
                     <div className="rating">
-                        <span>★ {rating.toFixed(1)}</span>
+                        <span>★ {restaurant.rating.toFixed(1)}</span>
                     </div>
                 )}
             </div>
+
             <div className="restaurant-info">
-                <h3 className="restaurant-name">{name}</h3>
-                {address && <p className="address">{address}</p>}
-                {categories && categories.length > 0 && (
-                    <div className="categories">
-                        {categories.map((category, index) => (
-                            <span key={index} className="tag">
-                                {category.name}
-                            </span>
-                        ))}
-                    </div>
-                )}
-                <button
-                    className="reservation-button"
-                    onClick={() => onMakeReservation(restaurant)}
-                >
-                    Make Reservation
-                </button>
+                <h3 className="restaurant-name">{restaurant.name}</h3>
+                {restaurant.address && <p className="address">{restaurant.address}</p>}
+                <div className="action-buttons">
+                    <button
+                        onClick={handleViewTables}
+                        className="reservation-link"
+                    >
+                        View Live Map
+                    </button>
+                    <button
+                        className="view-map-button"
+                        title="View Live Map"
+                        onClick={() => console.log("Navigating to map...")}
+                    >
+                        <Map size={20}/>
+                    </button>
+                </div>
             </div>
         </div>
     );
@@ -88,13 +93,7 @@ RestaurantCard.propTypes = {
         pictureUrl: PropTypes.string,
         rating: PropTypes.number,
         address: PropTypes.string,
-        categories: PropTypes.arrayOf(
-            PropTypes.shape({
-                name: PropTypes.string
-            })
-        ),
     }).isRequired,
-    onMakeReservation: PropTypes.func.isRequired,
     onLike: PropTypes.func,
     initialLiked: PropTypes.bool,
 };
