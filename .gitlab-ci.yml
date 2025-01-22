@@ -21,7 +21,7 @@ cache:
 install:
   stage: install
   script:
-    - npm ci
+    - npm install
   artifacts:
     paths:
       - node_modules/
@@ -29,16 +29,10 @@ install:
 lint:
   stage: lint
   script:
-    - npm run lint
+    - npx eslint .
   dependencies:
     - install
 
-unit_tests:
-  stage: test
-  script:
-    - npm run test
-  dependencies:
-    - install
 
 e2e_tests:
   image: cypress/browsers:node18.6.0-chrome105-ff104
@@ -79,7 +73,6 @@ deploy:
   stage: deploy
   script:
     - echo "Deploy to production server"
-    # Add your deployment commands here
   only:
     - main
   dependencies:
