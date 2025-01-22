@@ -1,0 +1,66 @@
+image: node:18-alpine
+
+variables:
+  # Change this if your main branch has a different name
+  MAIN_BRANCH: "main"
+
+# Cache dependencies between jobs
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - node_modules/
+    - .npm/
+
+stages:
+  - install
+  - test
+  - build
+  - deploy
+
+install:
+  stage: install
+  script:
+    - npm ci
+  artifacts:
+    paths:
+      - node_modules/
+
+lint:
+  stage: test
+  script:
+    - npm run lint
+  allow_failure: true
+
+build:
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+
+# Example deployment to staging/testing environment
+deploy_staging:
+  stage: deploy
+  script:
+    - echo "Deploying to staging..."
+    # Add your deployment commands here
+  only:
+    - develop
+  environment:
+    name: staging
+
+# Example deployment to production
+deploy_production:
+  stage: deploy
+  script:
+    - echo "Deploying to production..."
+    # Add your deployment commands here
+  only:
+    - main
+  environment:
+    name: production
+  when: manual # Requires manual approval

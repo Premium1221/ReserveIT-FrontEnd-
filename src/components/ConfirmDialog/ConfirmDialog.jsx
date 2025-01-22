@@ -6,27 +6,29 @@ const ConfirmDialog = ({ isOpen, message, onConfirm, onCancel, title = 'Confirm 
     if (!isOpen) return null;
 
     return (
-        <div className="confirm-dialog-overlay">
-            <div className="confirm-dialog">
+        <div className="confirm-dialog-overlay" data-testid="confirm-dialog-overlay">
+            <div className="confirm-dialog" data-testid="confirm-dialog">
                 <div className="confirm-dialog-header">
                     <AlertTriangle size={24} className="warning-icon" />
-                    <h2>{title}</h2>
+                    <h2 data-testid="confirm-dialog-title">{title}</h2>
                 </div>
 
                 <div className="confirm-dialog-content">
-                    <p>{message}</p>
+                    <p data-testid="confirm-dialog-message">{message}</p>
                 </div>
 
                 <div className="confirm-dialog-actions">
                     <button
                         className="cancel-button"
                         onClick={onCancel}
+                        data-testid="confirm-dialog-cancel-button"
                     >
                         Cancel
                     </button>
                     <button
                         className="confirm-button"
                         onClick={onConfirm}
+                        data-testid="confirm-dialog-confirm-button"
                     >
                         Delete
                     </button>
@@ -41,7 +43,7 @@ ConfirmDialog.propTypes = {
     message: PropTypes.string.isRequired,
     onConfirm: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
-    title: PropTypes.string
+    title: PropTypes.string,
 };
 
 export default ConfirmDialog;

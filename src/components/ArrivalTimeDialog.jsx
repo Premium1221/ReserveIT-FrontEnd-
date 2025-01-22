@@ -33,7 +33,7 @@ const ArrivalTimeDialog = ({ isOpen, onClose, onSubmit }) => {
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <div className="form-label">
-                            <Clock size={20} className="icon" />
+                            <Clock size={20} className="icon"/>
                             <label>Arrival Time</label>
                         </div>
 
@@ -46,6 +46,9 @@ const ArrivalTimeDialog = ({ isOpen, onClose, onSubmit }) => {
                             onChange={(e) => setArrivalMinutes(Number(e.target.value))}
                             className="slider"
                         />
+                        <div className="slider-value">
+                            {arrivalMinutes} minutes
+                        </div>
 
                         <div className="slider-value">
                             {arrivalMinutes} minutes
