@@ -3,7 +3,6 @@ image: node:18
 stages:
   - install
   - lint
-  - test
   - e2e
   - build
   - deploy
@@ -12,11 +11,9 @@ variables:
   npm_config_cache: "$CI_PROJECT_DIR/.npm"
 
 cache:
-  key: ${CI_COMMIT_REF_SLUG}
   paths:
     - .npm/
     - node_modules/
-    - build/
 
 install:
   stage: install
@@ -29,32 +26,22 @@ install:
 lint:
   stage: lint
   script:
-    - npx eslint .
+    - npx eslint . --max-warnings=0
   dependencies:
     - install
 
-
 e2e_tests:
-  image: cypress/browsers:node18.6.0-chrome105-ff104
   stage: e2e
-  services:
-    - mysql:8.0
-  variables:
-    MYSQL_ROOT_PASSWORD: Razmazvach14@
-    MYSQL_DATABASE: reserveit_db
-    MYSQL_ROOT_HOST: '%'
+  image: cypress/browsers:node18.6.0-chrome105-ff104
   script:
-    # Start dev server
-    - npm run dev &
-    # Wait for frontend to be ready
-    - npx wait-on http://localhost:5200
-    # Run Cypress tests
-    - npm run test:e2e
+    - npm start & # Start the dev server in the background
+    - npx wait-on http://localhost:5200 # Wait for the server to be ready
+    - npx cypress run # Run E2E tests
   artifacts:
     when: always
     paths:
-      - cypress/videos/**/*.mp4
-      - cypress/screenshots/**/*.png
+      - cypress/videos/
+      - cypress/screenshots/
     expire_in: 1 week
   dependencies:
     - install
@@ -72,7 +59,7 @@ build:
 deploy:
   stage: deploy
   script:
-    - echo "Deploy to production server"
+    - echo "Deploying to production..."
   only:
     - main
   dependencies:
