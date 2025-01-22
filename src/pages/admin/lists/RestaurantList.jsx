@@ -3,18 +3,18 @@ import PropTypes from 'prop-types';
 
 const RestaurantList = ({ restaurants, onDelete, onEdit }) => {
     return (
-        <div className="items-grid">
+        <div className="items-grid" data-testid="restaurants-grid">
             {restaurants.map((restaurant) => (
-                <div key={restaurant.id} className="item-card">
+                <div key={restaurant.id} className="item-card" data-testid="restaurant-card">
                     <div className="item-header">
-                        <h3>{restaurant.name}</h3>
-                        <span className="item-email">{restaurant.email}</span>
+                        <h3 data-testid="restaurant-name">{restaurant.name}</h3>
+                        <span className="item-email" data-testid="restaurant-email">{restaurant.email}</span>
                     </div>
 
                     <div className="item-details">
-                        <p>Address: {restaurant.address || 'N/A'}</p>
-                        <div className="rating">
-                            <Star size={16} className={restaurant.rating ? 'filled' : ''} />
+                        <p data-testid="restaurant-address">Address: {restaurant.address || 'N/A'}</p>
+                        <div className="rating" data-testid="restaurant-rating">
+                            <Star size={16} className={restaurant.rating ? 'filled' : ''}/>
                             <span>{restaurant.rating ? `${restaurant.rating}/5` : 'No rating'}</span>
                         </div>
                     </div>
@@ -24,16 +24,18 @@ const RestaurantList = ({ restaurants, onDelete, onEdit }) => {
                             <button
                                 onClick={() => onEdit(restaurant.id)}
                                 className="edit-button"
+                                data-testid="edit-restaurant-button"
                             >
-                                <Edit2 size={16} />
+                                <Edit2 size={16}/>
                                 Edit
                             </button>
                         )}
                         <button
                             onClick={() => onDelete(restaurant.id)}
                             className="delete-button"
+                            data-testid="delete-restaurant-button"
                         >
-                            <Trash2 size={16} />
+                            <Trash2 size={16}/>
                             Delete
                         </button>
                     </div>

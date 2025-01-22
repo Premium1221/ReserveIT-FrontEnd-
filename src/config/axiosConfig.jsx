@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
 const api = axios.create({
     baseURL: 'http://localhost:8080/api',
@@ -9,18 +9,16 @@ const api = axios.create({
     withCredentials: true
 });
 
+// Request interceptor
 api.interceptors.request.use(
     config => {
-        if (config.url === '/auth/refresh') {
+        if (config.url.includes('/auth/')) {
             return config;
         }
 
         const token = sessionStorage.getItem('accessToken');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
-            console.log('Adding token to request:', config.url); // Debug log
-        } else {
-            console.log('No token available for request:', config.url); // Debug log
         }
 
         return config;
@@ -28,28 +26,18 @@ api.interceptors.request.use(
     error => Promise.reject(error)
 );
 
+// Response interceptor
 api.interceptors.response.use(
     response => response,
     async error => {
         const originalRequest = error.config;
 
-        console.error('API Error:', {
-            status: error.response?.status,
-            url: originalRequest?.url,
-            method: originalRequest?.method,
-            error: error.message
-        });
-
-        if (error.response?.status === 500) {
-            toast.error('Server error. Please try again later.');
-            return Promise.reject(error);
-        }
-
-        if ((error.response?.status === 401 || error.response?.status === 403) &&
+        if (error.response?.status === 401 &&
             !originalRequest._retry &&
-            originalRequest.url !== '/auth/refresh') {
+            !originalRequest.url.includes('/auth/')) {
 
             originalRequest._retry = true;
+
             try {
                 const response = await api.post('/auth/refresh');
                 const { accessToken } = response.data;
@@ -64,6 +52,10 @@ api.interceptors.response.use(
                 window.location.href = '/login';
                 return Promise.reject(refreshError);
             }
+        }
+
+        if (error.response?.status === 500) {
+            toast.error('Server error. Please try again later.');
         }
 
         return Promise.reject(error);

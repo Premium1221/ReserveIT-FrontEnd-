@@ -8,8 +8,9 @@ import { useAuth } from "@/context/AuthContext";
 import AuthPrompt from './AuthPrompt';
 import TableShape from './TableShape';
 import TableHoverInfo from './TableHoverInfo';
-import QuickReservationDialog from "./QuickReservationDialog";
+import QuickReservationDialog from "./QuickReservationDialog/QuickReservationDialog.jsx";
 import ReservationModal from "@/components/ReservationModal.jsx";
+import './CustomerTableView.css';
 
 const CustomerTableView = () => {
     const navigate = useNavigate();
@@ -24,33 +25,31 @@ const CustomerTableView = () => {
         background: null,
         selectedTable: null,
         hoveredTable: null,
-        showReservationModal: false
+        showReservationModal: false,
     });
 
     const updateState = useCallback((updates) => {
-        setState(prev => ({...prev, ...(typeof updates === 'function' ? updates(prev) : updates)}));
+        setState(prev => ({ ...prev, ...(typeof updates === 'function' ? updates(prev) : updates) }));
     }, []);
 
-    // Fetch table data
     const fetchTableData = useCallback(async () => {
         try {
             const response = await api.get(`/tables/restaurant/${restaurantId}/tables`);
-            updateState({tables: response.data});
+            updateState({ tables: response.data });
         } catch (error) {
             console.error('Error fetching table data:', error);
             toast.error('Failed to refresh table data');
         }
     }, [restaurantId, updateState]);
 
-    // Handle table updates from WebSocket
     const handleTableUpdate = useCallback((updatedTable) => {
         updateState(prevState => ({
             tables: prevState.tables.map(table =>
-                table.id === updatedTable.id ? {...table, ...updatedTable} : table
+                table.id === updatedTable.id ? { ...table, ...updatedTable } : table
             ),
             selectedTable: prevState.selectedTable?.id === updatedTable.id
-                ? {...prevState.selectedTable, ...updatedTable}
-                : prevState.selectedTable
+                ? { ...prevState.selectedTable, ...updatedTable }
+                : prevState.selectedTable,
         }));
     }, [updateState]);
 
@@ -70,7 +69,6 @@ const CustomerTableView = () => {
         fetchUserData();
     }, [isAuthenticated, user]);
 
-    // WebSocket setup
     useEffect(() => {
         const cleanup = connectWebSocket(
             restaurantId,
@@ -85,19 +83,17 @@ const CustomerTableView = () => {
         return () => cleanup?.();
     }, [restaurantId, handleTableUpdate, fetchTableData]);
 
-    // Load background image
     useEffect(() => {
         const img = new window.Image();
         img.src = '/src/assets/table-map.png';
-        img.onload = () => updateState({background: img});
+        img.onload = () => updateState({ background: img });
         img.onerror = () => toast.error('Failed to load background image');
     }, [updateState]);
 
-    // Fetch initial data
     useEffect(() => {
         const fetchInitialData = async () => {
             if (!isAuthenticated) {
-                updateState({loading: false});
+                updateState({ loading: false });
                 return;
             }
 
@@ -109,12 +105,12 @@ const CustomerTableView = () => {
 
                 updateState({
                     restaurant: restaurantResponse.data,
-                    loading: false
+                    loading: false,
                 });
             } catch (error) {
                 console.error('Error loading initial data:', error);
                 toast.error('Failed to load restaurant data');
-                updateState({loading: false});
+                updateState({ loading: false });
             }
         };
 
@@ -138,7 +134,11 @@ const CustomerTableView = () => {
             }
         } catch (error) {
             console.error('Future reservation error:', error);
-            toast.error(error.response?.data?.message || 'Failed to create reservation');
+            if (error.response?.data?.message === "Restaurant is closed at this time") {
+                toast.error('Restaurant is closed at the selected time. Operating hours are 6 AM - 11:59 PM');
+            } else {
+                toast.error(error.response?.data?.message || 'Failed to create reservation');
+            }
         }
     };
 
@@ -148,7 +148,7 @@ const CustomerTableView = () => {
             let reservationDate;
 
             if (reservationData.immediate) {
-                reservationDate = now.toISOString().slice(0, 19);
+                reservationDate = Date.now()
             } else {
                 const arrivalTime = new Date(now.getTime() + (reservationData.arrivalMinutes * 60000));
                 reservationDate = arrivalTime.toISOString().slice(0, 19);
@@ -162,17 +162,17 @@ const CustomerTableView = () => {
                 reservationDate: reservationDate,
                 duration: 180,
                 specialRequests: '',
-                status: 'CONFIRMED'
+                status: 'CONFIRMED',
             };
 
             const response = await api.post('/reservations/quick', reservationRequest, {
-                params: {immediate: reservationData.immediate}
+                params: { immediate: reservationData.immediate },
             });
 
             if (response.data) {
                 toast.success('Reservation created successfully!');
                 await fetchTableData();
-                updateState({showReservationModal: false, selectedTable: null});
+                updateState({ showReservationModal: false, selectedTable: null });
             }
         } catch (error) {
             console.error('Reservation error:', error);
@@ -194,98 +194,99 @@ const CustomerTableView = () => {
 
         updateState({
             selectedTable: table,
-            showReservationModal: true
+            showReservationModal: true,
         });
     };
 
     if (!isAuthenticated) {
-        return <AuthPrompt restaurantName={state.restaurant?.name}/>;
+        return <AuthPrompt restaurantName={state.restaurant?.name} />;
     }
 
     if (state.loading) {
         return (
             <div className="flex justify-center items-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"/>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" />
             </div>
         );
     }
 
     return (
-        <div className="p-4">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">
+        <div className="container" data-testid="customer-table-view">
+            <div className="header">
+                <h1 className="header-title">
                     {state.restaurant?.name || 'Restaurant'} - Table Layout
                 </h1>
                 <button
                     onClick={() => updateState({ showReservationModal: true })}
-                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors flex items-center gap-2"
+                    className="button-primary"
                 >
                     Make Future Reservation
                 </button>
             </div>
 
-            <div className="mb-4 p-4 bg-blue-50 border-l-4 border-blue-400 text-blue-700">
+            <div className="info-box">
                 <p>Click on an available table to make a quick reservation</p>
             </div>
 
-            <div className="mb-4">
-                <div className="flex gap-4 justify-center">
-                    {['Available', 'Occupied', 'Reserved'].map((status, index) => (
-                        <div key={status} className="flex items-center gap-2">
-                            <div className={`w-4 h-4 rounded-full bg-${
-                                index === 0 ? 'green' : index === 1 ? 'red' : 'yellow'
-                            }-500`}/>
-                            <span>{status}</span>
-                        </div>
-                    ))}
-                </div>
+            <div className="status-indicator">
+                {['Available', 'Occupied', 'Reserved'].map((status, index) => (
+                    <div key={status} className="status-item">
+                        <div
+                            className={`status-dot ${
+                                index === 0 ? 'status-available' : index === 1 ? 'status-occupied' : 'status-reserved'
+                            }`}
+                        />
+                        <span>{status}</span>
+                    </div>
+                ))}
             </div>
 
-            <Stage width={800} height={600}>
-                <Layer>
-                    {state.background && <Image image={state.background} width={800} height={600}/>}
-                    {state.tables && state.tables.map((table) => (
-                        <TableShape
-                            key={table.id}
-                            table={table}
-                            onClick={() => handleTableClick(table)}
-                            onMouseEnter={() => updateState(prev => ({...prev, hoveredTable: table}))}
-                            onMouseLeave={() => updateState(prev => ({...prev, hoveredTable: null}))}
-                            draggable={false}
-                        />
-                    ))}
-                    {state.hoveredTable && (
-                        <TableHoverInfo
-                            table={state.hoveredTable}
-                            mouseX={state.hoveredTable.xPosition}
-                            mouseY={state.hoveredTable.yPosition}
-                        />
-                    )}
-                </Layer>
-            </Stage>
+            <div className="canvas-container">
+                <Stage width={800} height={600}>
+                    <Layer>
+                        {state.background && <Image image={state.background} width={800} height={600} />}
+                        {state.tables &&
+                            state.tables.map((table) => (
+                                <TableShape
+                                    key={table.id}
+                                    table={table}
+                                    onClick={() => handleTableClick(table)}
+                                    onMouseEnter={() => updateState((prev) => ({ ...prev, hoveredTable: table }))}
+                                    onMouseLeave={() => updateState((prev) => ({ ...prev, hoveredTable: null }))}
+                                    draggable={false}
+                                />
+                            ))}
+                        {state.hoveredTable && (
+                            <TableHoverInfo
+                                table={state.hoveredTable}
+                                mouseX={state.hoveredTable.xPosition}
+                                mouseY={state.hoveredTable.yPosition}
+                            />
+                        )}
+                    </Layer>
+                </Stage>
+            </div>
 
-            {/* Quick Reservation Dialog */}
             {state.showReservationModal && state.selectedTable && (
                 <QuickReservationDialog
                     isOpen={state.showReservationModal}
-                    onClose={() => updateState({showReservationModal: false, selectedTable: null})}
+                    onClose={() => updateState({ showReservationModal: false, selectedTable: null })}
                     onSubmit={handleQuickReservation}
                     selectedTable={state.selectedTable}
                     restaurantId={restaurantId}
                 />
             )}
 
-            {/* Future Reservation Modal */}
             {state.showReservationModal && !state.selectedTable && (
                 <ReservationModal
                     restaurant={state.restaurant}
                     isOpen={state.showReservationModal}
-                    onClose={() => updateState({showReservationModal: false})}
-                    onSubmit={handleFutureReservation}
+                    onClose={() => updateState({ showReservationModal: false })}
+                    onSubmit={handleFutureReservation}  // Remove the immediate function call
                 />
             )}
         </div>
     );
-}
+};
 
 export default CustomerTableView;

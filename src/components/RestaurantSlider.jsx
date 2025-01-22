@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import Slider from 'react-slick';
-import RestaurantCard from './RestaurantCard';
+import RestaurantCard from './RestaurantCard/RestaurantCard.jsx';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import './RestaurantSlider.css';

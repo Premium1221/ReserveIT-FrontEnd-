@@ -1,0 +1,76 @@
+/* CustomerTableView.css */
+
+.container {
+    padding: 16px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.header-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.button-primary {
+    padding: 8px 16px;
+    background-color: #6b46c1;
+    color: white;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+}
+
+.button-primary:hover {
+    background-color: #553c9a;
+}
+
+.info-box {
+    margin-bottom: 16px;
+    padding: 16px;
+    background-color: #ebf8ff;
+    border-left: 4px solid #3182ce;
+    color: #2b6cb0;
+}
+
+.status-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+.status-available {
+    background-color: #48bb78;
+}
+
+.status-occupied {
+    background-color: #f56565;
+}
+
+.status-reserved {
+    background-color: #ecc94b;
+}
+
+.canvas-container {
+    margin: auto;
+}

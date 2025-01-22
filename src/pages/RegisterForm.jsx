@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import { Mail, Lock, User, Phone } from 'lucide-react';
-import './LoginForm.css';
+import './RegisterForm.css';
+import api from '../config/axiosConfig';
 
 const RegisterForm = () => {
     const [formData, setFormData] = useState({
@@ -17,7 +17,6 @@ const RegisterForm = () => {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const { register } = useAuth();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -38,20 +37,32 @@ const RegisterForm = () => {
             return;
         }
 
-        try {
-            await register(
-                formData.firstName,
-                formData.lastName,
-                formData.email,
-                formData.password,
-                formData.phoneNumber
-            );
+        // Phone number validation
+        const phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(formData.phoneNumber)) {
+            setError("Phone number must be 10 digits");
+            setLoading(false);
+            return;
+        }
 
-            toast.success('Registration successful!');
-            navigate('/login');
+        try {
+            const response = await api.post('/auth/register', {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                password: formData.password,
+                phoneNumber: formData.phoneNumber
+            });
+
+            if (response.data.accessToken) {
+                toast.success('Registration successful! Please log in.');
+                navigate('/login');
+            }
         } catch (err) {
-            setError(err.response?.data?.message || "Registration failed");
-            toast.error(err.response?.data?.message || "Registration failed");
+            const errorMessage = err.response?.data?.message ||
+                (err.response?.status === 409 ? "Email already exists" : "Registration failed");
+            setError(errorMessage);
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -77,6 +88,7 @@ const RegisterForm = () => {
                         value={formData.firstName}
                         onChange={handleChange}
                         required
+                        minLength={2}
                         disabled={loading}
                     />
                 </div>
@@ -90,6 +102,7 @@ const RegisterForm = () => {
                         value={formData.lastName}
                         onChange={handleChange}
                         required
+                        minLength={2}
                         disabled={loading}
                     />
                 </div>
@@ -103,6 +116,7 @@ const RegisterForm = () => {
                         value={formData.email}
                         onChange={handleChange}
                         required
+                        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                         disabled={loading}
                     />
                 </div>
@@ -112,10 +126,11 @@ const RegisterForm = () => {
                     <input
                         type="tel"
                         name="phoneNumber"
-                        placeholder="Phone Number"
+                        placeholder="Phone Number (10 digits)"
                         value={formData.phoneNumber}
                         onChange={handleChange}
                         required
+                        pattern="\d{10}"
                         disabled={loading}
                     />
                 </div>
@@ -129,6 +144,7 @@ const RegisterForm = () => {
                         value={formData.password}
                         onChange={handleChange}
                         required
+                        minLength={6}
                         disabled={loading}
                     />
                 </div>
@@ -142,6 +158,7 @@ const RegisterForm = () => {
                         value={formData.confirmPassword}
                         onChange={handleChange}
                         required
+                        minLength={6}
                         disabled={loading}
                     />
                 </div>

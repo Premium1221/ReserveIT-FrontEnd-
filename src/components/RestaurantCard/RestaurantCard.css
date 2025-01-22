@@ -1,8 +1,9 @@
 .restaurant-card {
     position: relative;
-    width: 320px;
+    width: calc(100% - 20px);
+    max-width: 360px;
     min-height: 420px;
-    margin: 15px;
+    margin: 10px;
     border-radius: 16px;
     overflow: hidden;
     background: #ffffff;
@@ -29,6 +30,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-bottom: 1px solid #e5e7eb;
 }
 
 .like-button {
@@ -74,21 +76,23 @@
 }
 
 .restaurant-name {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 600;
     margin-bottom: 8px;
     color: #1f2937;
+    text-align: center;
 }
 
 .address {
     color: #6b7280;
     font-size: 0.875rem;
     margin-bottom: 16px;
+    text-align: center;
 }
 
 .action-buttons {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
 }
 
@@ -96,10 +100,12 @@
     text-decoration: none;
     background: #7d0ca8;
     color: white;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border-radius: 8px;
     font-weight: 600;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    display: inline-block;
+    text-align: center;
 }
 
 .reservation-link:hover {
@@ -111,7 +117,7 @@
     background: #e5e7eb;
     border: none;
     border-radius: 50%;
-    padding: 8px;
+    padding: 10px;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
@@ -120,13 +126,18 @@
     background: #d1d5db;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .restaurant-card {
-        width: 280px;
-        min-height: 360px;
+        width: calc(50% - 20px);
+    }
+}
+
+@media (max-width: 480px) {
+    .restaurant-card {
+        width: calc(100% - 20px);
     }
 
     .restaurant-card-image {
-        height: 180px;
+        height: 200px;
     }
 }

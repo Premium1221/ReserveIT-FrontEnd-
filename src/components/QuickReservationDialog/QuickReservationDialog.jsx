@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Clock, Users } from 'lucide-react';
+import { toast } from 'react-toastify';
 import './QuickReservationDialog.css';
 
 const QuickReservationDialog = ({ isOpen, onClose, onSubmit, selectedTable }) => {
@@ -10,8 +11,16 @@ const QuickReservationDialog = ({ isOpen, onClose, onSubmit, selectedTable }) =>
 
     if (!isOpen) return null;
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        const now = new Date();
+        const hour = now.getHours();
+
+        // Check if current hour is before 6 AM
+        if (hour < 6) {
+            toast.error("The restaurant is currently closed. We open at 6 AM.");
+            return;
+        }
 
         const reservationData = {
             tableId: selectedTable.id,
@@ -26,9 +35,14 @@ const QuickReservationDialog = ({ isOpen, onClose, onSubmit, selectedTable }) =>
     return (
         <div className="dialog-overlay" data-testid="quick-reservation-dialog">
             <div className="dialog-container">
-                <h2 className="dialog-title" data-testid="dialog-title">Quick Reservation</h2>
+                <h2 className="dialog-title">Quick Reservation</h2>
 
-                <form onSubmit={handleSubmit} className="form" data-testid="reservation-form">
+                {/* Display restaurant hours notice */}
+                <div className="business-hours-notice">
+                    Operating Hours: 6:00 AM - 11:59 PM
+                </div>
+
+                <form onSubmit={handleSubmit} className="form">
                     {/* Party Size */}
                     <div className="form-group">
                         <label className="form-label">
@@ -39,17 +53,12 @@ const QuickReservationDialog = ({ isOpen, onClose, onSubmit, selectedTable }) =>
                             value={partySize}
                             onChange={(e) => setPartySize(parseInt(e.target.value))}
                             className="form-select"
-                            data-testid="party-size-select"
                         >
                             {Array.from(
                                 { length: selectedTable.capacity },
                                 (_, i) => i + 1
                             ).map((num) => (
-                                <option
-                                    key={num}
-                                    value={num}
-                                    data-testid={`party-size-option-${num}`}
-                                >
+                                <option key={num} value={num}>
                                     {num} {num === 1 ? 'person' : 'people'}
                                 </option>
                             ))}
@@ -59,7 +68,7 @@ const QuickReservationDialog = ({ isOpen, onClose, onSubmit, selectedTable }) =>
                     {/* Reservation Type */}
                     <div className="form-group">
                         <label className="form-label">Arrival Time</label>
-                        <div className="radio-group" data-testid="arrival-type-group">
+                        <div className="radio-group">
                             <label className="radio-item">
                                 <input
                                     type="radio"
@@ -67,7 +76,6 @@ const QuickReservationDialog = ({ isOpen, onClose, onSubmit, selectedTable }) =>
                                     checked={reservationType === 'immediate'}
                                     onChange={(e) => setReservationType(e.target.value)}
                                     className="radio-input"
-                                    data-testid="immediate-seating-radio"
                                 />
                                 Immediate Seating
                             </label>
@@ -78,7 +86,6 @@ const QuickReservationDialog = ({ isOpen, onClose, onSubmit, selectedTable }) =>
                                     checked={reservationType === 'scheduled'}
                                     onChange={(e) => setReservationType(e.target.value)}
                                     className="radio-input"
-                                    data-testid="scheduled-seating-radio"
                                 />
                                 Schedule Arrival
                             </label>
@@ -87,7 +94,7 @@ const QuickReservationDialog = ({ isOpen, onClose, onSubmit, selectedTable }) =>
 
                     {/* Arrival Time Selection */}
                     {reservationType === 'scheduled' && (
-                        <div className="form-group" data-testid="arrival-time-group">
+                        <div className="form-group">
                             <label className="form-label">
                                 <Clock size={20} />
                                 Arrival in
@@ -96,12 +103,11 @@ const QuickReservationDialog = ({ isOpen, onClose, onSubmit, selectedTable }) =>
                                 value={arrivalMinutes}
                                 onChange={(e) => setArrivalMinutes(e.target.value)}
                                 className="form-select"
-                                data-testid="arrival-time-select"
                             >
-                                <option value="15" data-testid="arrival-time-15">15 minutes</option>
-                                <option value="30" data-testid="arrival-time-30">30 minutes</option>
-                                <option value="45" data-testid="arrival-time-45">45 minutes</option>
-                                <option value="60" data-testid="arrival-time-60">1 hour</option>
+                                <option value="15">15 minutes</option>
+                                <option value="30">30 minutes</option>
+                                <option value="45">45 minutes</option>
+                                <option value="60">1 hour</option>
                             </select>
                         </div>
                     )}
@@ -111,14 +117,12 @@ const QuickReservationDialog = ({ isOpen, onClose, onSubmit, selectedTable }) =>
                             type="button"
                             onClick={onClose}
                             className="button button-cancel"
-                            data-testid="cancel-reservation"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             className="button button-confirm"
-                            data-testid="confirm-reservation"
                         >
                             Confirm Reservation
                         </button>

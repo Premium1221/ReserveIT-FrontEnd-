@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import './AuthPrompt.css';
+import React from 'react';
 
 const AuthPrompt = ({ restaurantName }) => (
     <div className="auth-prompt-container">

@@ -14,7 +14,6 @@ describe('RestaurantCard Component', () => {
     };
 
     beforeEach(() => {
-        // Mount component before each test
         mount(
             <AuthProvider>
                 <BrowserRouter>
@@ -35,17 +34,14 @@ describe('RestaurantCard Component', () => {
     });
 
     it('should handle liking the restaurant', () => {
-        // Click the like button
         cy.get('.like-button').click();
         cy.get('@onLike').should('have.been.calledWith', restaurant.id, true);
 
-        // Click again to unlike
         cy.get('.like-button').click();
         cy.get('@onLike').should('have.been.calledWith', restaurant.id, false);
     });
 
     it('should display restaurant image with fallback', () => {
-        // Remount with missing image URL
         mount(
             <AuthProvider>
                 <BrowserRouter>
@@ -61,7 +57,6 @@ describe('RestaurantCard Component', () => {
     });
 
     it('should display rating if available', () => {
-        // Remount with different rating
         mount(
             <AuthProvider>
                 <BrowserRouter>
@@ -77,7 +72,6 @@ describe('RestaurantCard Component', () => {
     });
 
     it('should not display rating if not available', () => {
-        // Remount without rating
         mount(
             <AuthProvider>
                 <BrowserRouter>

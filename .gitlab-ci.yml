@@ -1,23 +1,22 @@
-image: node:18-alpine
-
-variables:
-  # Change this if your main branch has a different name
-  MAIN_BRANCH: "main"
-
-# Cache dependencies between jobs
-cache:
-  key:
-    files:
-      - package-lock.json
-  paths:
-    - node_modules/
-    - .npm/
+image: node:18
 
 stages:
   - install
+  - lint
   - test
+  - e2e
   - build
   - deploy
+
+variables:
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm/
+    - node_modules/
+    - build/
 
 install:
   stage: install
@@ -28,10 +27,43 @@ install:
       - node_modules/
 
 lint:
-  stage: test
+  stage: lint
   script:
     - npm run lint
-  allow_failure: true
+  dependencies:
+    - install
+
+unit_tests:
+  stage: test
+  script:
+    - npm run test
+  dependencies:
+    - install
+
+e2e_tests:
+  image: cypress/browsers:node18.6.0-chrome105-ff104
+  stage: e2e
+  services:
+    - mysql:8.0
+  variables:
+    MYSQL_ROOT_PASSWORD: Razmazvach14@
+    MYSQL_DATABASE: reserveit_db
+    MYSQL_ROOT_HOST: '%'
+  script:
+    # Start dev server
+    - npm run dev &
+    # Wait for frontend to be ready
+    - npx wait-on http://localhost:5200
+    # Run Cypress tests
+    - npm run test:e2e
+  artifacts:
+    when: always
+    paths:
+      - cypress/videos/**/*.mp4
+      - cypress/screenshots/**/*.png
+    expire_in: 1 week
+  dependencies:
+    - install
 
 build:
   stage: build
@@ -40,27 +72,15 @@ build:
   artifacts:
     paths:
       - dist/
-    expire_in: 1 week
+  dependencies:
+    - install
 
-# Example deployment to staging/testing environment
-deploy_staging:
+deploy:
   stage: deploy
   script:
-    - echo "Deploying to staging..."
-    # Add your deployment commands here
-  only:
-    - develop
-  environment:
-    name: staging
-
-# Example deployment to production
-deploy_production:
-  stage: deploy
-  script:
-    - echo "Deploying to production..."
+    - echo "Deploy to production server"
     # Add your deployment commands here
   only:
     - main
-  environment:
-    name: production
-  when: manual # Requires manual approval
+  dependencies:
+    - build

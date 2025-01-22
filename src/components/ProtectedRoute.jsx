@@ -15,23 +15,35 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     if (!isAuthenticated || !user) {
         return (
             <Navigate
-                to="/login"
-                state={{ from: location.pathname }}
+                to={`/login?returnUrl=${encodeURIComponent(location.pathname)}`}
                 replace
             />
         );
     }
 
-    // Check if user has the required role
     if (allowedRoles && !allowedRoles.includes(user.role)) {
         toast.error(`Access denied. Required role: ${allowedRoles.join(' or ')}`);
 
-        return <Navigate to="/" replace />;
+        const redirectPath = getRoleBasedPath(user.role);
+        return <Navigate to={redirectPath} replace />;
     }
 
     return children;
 };
 
+const getRoleBasedPath = (role) => {
+    switch (role) {
+        case 'ADMIN':
+            return '/admin-dashboard';
+        case 'MANAGER':
+            return '/restaurant-dashboard';
+        case 'STAFF':
+            return '/staff-dashboard';
+        case 'CUSTOMER':
+        default:
+            return '/';
+    }
+};
 ProtectedRoute.propTypes = {
     children: PropTypes.node.isRequired,
     allowedRoles: PropTypes.arrayOf(PropTypes.string)

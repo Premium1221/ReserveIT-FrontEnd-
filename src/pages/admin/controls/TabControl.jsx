@@ -3,12 +3,13 @@ import './TabControl.css';
 
 const TabControl = ({ activeTab, onTabChange, tabs }) => {
     return (
-        <div className="tab-controls">
-            {tabs.map(tab => (
+        <div className="tab-controls" data-testid="tab-controls">
+            {tabs.map((tab) => (
                 <button
                     key={tab.id}
-                    className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+                    className={activeTab === tab.id ? 'active-tab' : ''}
                     onClick={() => onTabChange(tab.id)}
+                    data-testid={tab.testId}
                 >
                     {tab.label}
                 </button>

@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import {Link, useNavigate} from "react-router-dom";
 import "./RestaurantCard.css";
 import {useAuth} from "@/context/AuthContext.jsx";
-import {toast} from "react-toastify"; // Ensure you import the CSS file
+import {toast} from "react-toastify";
 
 const RestaurantCard = ({ restaurant, onLike, initialLiked = false }) => {
     const [isLiked, setIsLiked] = useState(initialLiked);

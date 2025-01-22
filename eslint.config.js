@@ -1,8 +1,9 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import react from 'eslint-plugin-react'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+import js from '@eslint/js';
+import globals from 'globals';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import cypress from 'eslint-plugin-cypress';
 
 export default [
   { ignores: ['dist'] },
@@ -10,14 +11,24 @@ export default [
     files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      sourceType: 'module',
       parserOptions: {
         ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
+        ecmaFeatures: { jsx: true }
       },
+      globals: {
+        ...globals.browser,
+        ...globals.es2021,
+        window: true,
+        document: true,
+        AudioWorkletGlobalScope: true 
+      }
     },
-    settings: { react: { version: '18.3' } },
+    settings: {
+      react: {
+        version: '18.3'
+      }
+    },
     plugins: {
       react,
       'react-hooks': reactHooks,
@@ -35,4 +46,21 @@ export default [
       ],
     },
   },
-]
+  {
+    files: ['cypress/**/*.js', 'cypress/**/*.cy.js'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.cypress
+      },
+    },
+    plugins: {
+      cypress,
+    },
+    rules: {
+      ...cypress.configs.recommended.rules,
+      'no-undef': 'off',
+    },
+  },
+];

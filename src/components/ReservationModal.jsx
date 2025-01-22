@@ -14,26 +14,32 @@ const ReservationModal = ({ restaurant, isOpen, onClose, onSubmit, selectedTable
     const [currentStep, setCurrentStep] = useState(1);
 
     const timeSlots = [];
-    for (let hour = 11; hour <= 22; hour++) {
+    for (let hour = 6; hour <= 23; hour++) {  // Updated hours to match business hours
         timeSlots.push(`${String(hour).padStart(2, '0')}:00`);
         timeSlots.push(`${String(hour).padStart(2, '0')}:30`);
     }
 
-    const handleFinalSubmit = (e) => {
+    const handleFormSubmit = (e) => {
         e.preventDefault();
+        if (currentStep === 1) {
+            setCurrentStep(2);
+            return;
+        }
+
         const reservationDate = `${formData.date}T${formData.time}:00`;
-        onSubmit({
+        const reservationData = {
             ...formData,
             reservationDate,
             tableId: selectedTable?.id,
             companyId: restaurant.id
-        });
+        };
+
+        onSubmit(reservationData);
         onClose();
     };
 
-    const handleNextStep = (e) => {
-        e.preventDefault(); // Prevent form submission
-        setCurrentStep(2);
+    const handleBack = () => {
+        setCurrentStep(1);
     };
 
     if (!isOpen) return null;
@@ -51,109 +57,115 @@ const ReservationModal = ({ restaurant, isOpen, onClose, onSubmit, selectedTable
                     </div>
                 )}
 
+                <div className="business-hours-notice">
+                    Operating Hours: 6:00 AM - 11:59 PM
+                </div>
+
                 <div className="progress-bar">
                     <div className={`progress-step ${currentStep === 1 ? 'active' : ''}`} />
                     <div className={`progress-step ${currentStep === 2 ? 'active' : ''}`} />
                 </div>
 
-                {currentStep === 1 ? (
-                    <form onSubmit={handleNextStep} className="form-section">
-                        <div className="form-group">
-                            <label className="form-label">
-                                <Calendar className="icon" /> Select Date
-                            </label>
-                            <input
-                                type="date"
-                                value={formData.date}
-                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                min={new Date().toISOString().split('T')[0]}
-                                className="form-input"
-                                required
-                            />
-                        </div>
+                <form onSubmit={handleFormSubmit} className="form-section">
+                    {currentStep === 1 ? (
+                        <>
+                            <div className="form-group">
+                                <label className="form-label">
+                                    <Calendar className="icon" /> Select Date
+                                </label>
+                                <input
+                                    type="date"
+                                    value={formData.date}
+                                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                    min={new Date().toISOString().split('T')[0]}
+                                    className="form-input"
+                                    required
+                                />
+                            </div>
 
-                        <div className="form-group">
-                            <label className="form-label">
-                                <Clock className="icon" /> Select Time
-                            </label>
-                            <select
-                                value={formData.time}
-                                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                                className="form-select"
-                                required
-                            >
-                                <option value="">Choose time</option>
-                                {timeSlots.map(time => (
-                                    <option key={time} value={time}>{time}</option>
-                                ))}
-                            </select>
-                        </div>
+                            <div className="form-group">
+                                <label className="form-label">
+                                    <Clock className="icon" /> Select Time
+                                </label>
+                                <select
+                                    value={formData.time}
+                                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                                    className="form-select"
+                                    required
+                                >
+                                    <option value="">Choose time</option>
+                                    {timeSlots.map(time => (
+                                        <option key={time} value={time}>{time}</option>
+                                    ))}
+                                </select>
+                            </div>
 
-                        <div className="form-group">
-                            <label className="form-label">
-                                <Users className="icon" /> Number of People
-                            </label>
-                            <select
-                                value={formData.numberOfPeople}
-                                onChange={(e) => setFormData({ ...formData, numberOfPeople: Number(e.target.value) })}
-                                className="form-select"
-                                required
-                            >
-                                {Array.from({ length: selectedTable?.capacity || 10 }, (_, i) => i + 1).map(num => (
-                                    <option key={num} value={num}>
-                                        {num} {num === 1 ? 'person' : 'people'}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                            <div className="form-group">
+                                <label className="form-label">
+                                    <Users className="icon" /> Number of People
+                                </label>
+                                <select
+                                    value={formData.numberOfPeople}
+                                    onChange={(e) => setFormData({ ...formData, numberOfPeople: Number(e.target.value) })}
+                                    className="form-select"
+                                    required
+                                >
+                                    {Array.from({ length: selectedTable?.capacity || 10 }, (_, i) => i + 1).map(num => (
+                                        <option key={num} value={num}>
+                                            {num} {num === 1 ? 'person' : 'people'}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
-                        <div className="button-group">
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="button button-cancel"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                className="button button-primary"
-                            >
-                                Next
-                            </button>
-                        </div>
-                    </form>
-                ) : (
-                    <form onSubmit={handleFinalSubmit} className="form-section">
-                        <div className="form-group">
-                            <label className="form-label">
-                                <MessageSquare className="icon" /> Special Requests
-                            </label>
-                            <textarea
-                                value={formData.specialRequests}
-                                onChange={(e) => setFormData({ ...formData, specialRequests: e.target.value })}
-                                placeholder="Any special requirements or preferences?"
-                                className="form-textarea textarea-large"
-                            />
-                        </div>
+                            <div className="button-group">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="button button-cancel"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="button button-primary"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="form-group">
+                                <label className="form-label">
+                                    <MessageSquare className="icon" /> Special Requests
+                                </label>
+                                <textarea
+                                    value={formData.specialRequests}
+                                    onChange={(e) => setFormData({ ...formData, specialRequests: e.target.value })}
+                                    placeholder="Any special requirements or preferences?"
+                                    className="form-textarea textarea-large"
+                                />
+                            </div>
 
-                        <div className="button-group">
-                            <button
-                                type="button"
-                                onClick={() => setCurrentStep(1)}
-                                className="button button-cancel"
-                            >
-                                Back
-                            </button>
-                            <button
-                                type="submit"
-                                className="button button-primary"
-                            >
-                                Confirm Reservation
-                            </button>
-                        </div>
-                    </form>
-                )}
+                            <div className="button-group">
+                                <button
+                                    type="button"
+                                    onClick={handleBack}
+                                    className="button button-cancel"
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="button button-primary"
+                                >
+                                    Confirm Reservation
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </form>
             </div>
         </div>
     );

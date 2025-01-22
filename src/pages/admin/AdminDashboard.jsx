@@ -1,24 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, UserPlus, Search, RefreshCcw } from 'lucide-react';
+import { AlertCircle, UserPlus, Search, RefreshCcw, PlusCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../config/axiosConfig';
 import { toast } from 'react-toastify';
 
 import AddUserForm from './forms/AddUserForm';
+import AddRestaurantForm from './forms/AddRestaurantForm';
 import UserList from './lists/UserList';
 import RestaurantList from './lists/RestaurantList';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage';
 import TabControl from './controls/TabControl';
-import ConfirmDialog from "../../components/ConfirmDialog";
-
+import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog.jsx";
 
 import './AdminDashboard.css';
 import ClearReservationsButton from "@/components/ClearReservationsButton.jsx";
 
 const AdminDashboard = () => {
-    // State management
     const [activeTab, setActiveTab] = useState('users');
     const [users, setUsers] = useState([]);
     const [restaurants, setRestaurants] = useState([]);
@@ -26,6 +25,7 @@ const AdminDashboard = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [error, setError] = useState(null);
     const [showAddUserForm, setShowAddUserForm] = useState(false);
+    const [showAddRestaurantForm, setShowAddRestaurantForm] = useState(false);
     const [confirmDialog, setConfirmDialog] = useState({
         isOpen: false,
         itemId: null,
@@ -62,7 +62,6 @@ const AdminDashboard = () => {
         }
     }, [isAuthenticated, user, navigate]);
 
-    // Fetch both users and restaurants data
     const fetchInitialData = async () => {
         try {
             setLoading(true);
@@ -79,25 +78,10 @@ const AdminDashboard = () => {
 
     const fetchUsers = async () => {
         try {
-            console.log('Current user role:', user?.role); // Debug log
-            const token = sessionStorage.getItem('accessToken');
-            console.log('Using token:', token); // Debug log
-
             const response = await api.get('/admin/users');
-            console.log('Users response:', response.data);
             setUsers(response.data);
         } catch (error) {
-            console.error('Error fetching users:', {
-                status: error.response?.status,
-                data: error.response?.data,
-                config: error.config,
-                headers: error.response?.headers
-            });
-            if (error.response?.status === 403) {
-                toast.error('Access denied: Insufficient permissions');
-            } else {
-                toast.error('Failed to fetch users');
-            }
+            console.error('Error fetching users:', error);
             throw error;
         }
     };
@@ -114,7 +98,6 @@ const AdminDashboard = () => {
 
     const handleAddUser = async (userData) => {
         try {
-            console.log('Sending user data:', userData);
             const requestData = {
                 firstName: userData.firstName,
                 lastName: userData.lastName,
@@ -137,23 +120,25 @@ const AdminDashboard = () => {
             }
         } catch (error) {
             console.error('Create user error:', error);
-            const errorMessage = error.response?.data?.message
-                || error.message
-                || 'Failed to create user';
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to create user';
             toast.error(errorMessage);
         }
     };
 
-    const handleEditUser = (userId) => {
-        const userToEdit = users.find(user => user.id === userId);
-        console.log('Editing user:', userToEdit);
-        toast.info('Edit functionality coming soon!');
-    };
+    const handleAddRestaurant = async (restaurantData) => {
+        try {
+            const response = await api.post('/companies', restaurantData);
 
-    const handleEditRestaurant = (restaurantId) => {
-        const restaurantToEdit = restaurants.find(restaurant => restaurant.id === restaurantId);
-        console.log('Editing restaurant:', restaurantToEdit);
-        toast.info('Edit functionality coming soon!');
+            if (response.data) {
+                await fetchRestaurants();
+                toast.success('Restaurant created successfully');
+                setShowAddRestaurantForm(false);
+            }
+        } catch (error) {
+            console.error('Create restaurant error:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to create restaurant';
+            toast.error(errorMessage);
+        }
     };
 
     const handleDeleteUser = (id) => {
@@ -179,9 +164,8 @@ const AdminDashboard = () => {
     const handleConfirmDelete = async () => {
         const { itemId, itemType } = confirmDialog;
         try {
-
             if (itemType === 'user') {
-                await api.delete(`admin/users/${itemId.toString()}`);
+                await api.delete(`admin/users/${itemId}`);
                 setUsers(users.filter(user => user.id !== itemId));
                 toast.success('User deleted successfully');
             } else {
@@ -190,7 +174,7 @@ const AdminDashboard = () => {
                 toast.success('Restaurant deleted successfully');
             }
         } catch (error) {
-            console.error('Delete error:', error.response?.data || error.message);
+            console.error('Delete error:', error);
             toast.error(error.response?.data || `Failed to delete ${itemType}`);
         } finally {
             setConfirmDialog({ isOpen: false, itemId: null, itemType: null, message: '' });
@@ -219,26 +203,35 @@ const AdminDashboard = () => {
 
     return (
         <div className="admin-dashboard">
-            <div className="dashboard-header">
+            <div className="dashboard-header" data-testid="dashboard-header">
                 <h1>Admin Dashboard</h1>
+                <input
+                    type="text"
+                    placeholder={`Search ${activeTab}...`}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    data-testid="search-input"
+                />
                 <TabControl
                     activeTab={activeTab}
                     onTabChange={setActiveTab}
                     tabs={[
-                        { id: 'users', label: 'Users' },
-                        { id: 'restaurants', label: 'Restaurants' }
+                        { id: 'users', label: 'Users', testId: 'tab-Users' },
+                        { id: 'restaurants', label: 'Restaurants', testId: 'tab-Restaurants' }
                     ]}
                 />
+
             </div>
 
-            <div className="controls">
+            <div className="controls" data-testid="controls">
                 <div className="search-bar">
-                    <Search size={20} />
+                    <Search size={20}/>
                     <input
                         type="text"
                         placeholder={`Search ${activeTab}...`}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        data-testid="search-input"
                     />
                 </div>
 
@@ -254,9 +247,21 @@ const AdminDashboard = () => {
                     <button
                         className="add-button"
                         onClick={() => setShowAddUserForm(true)}
+                        data-testid="add-user-button"
                     >
                         <UserPlus size={20} />
                         Add User
+                    </button>
+                )}
+
+                {activeTab === 'restaurants' && (
+                    <button
+                        className="add-button"
+                        onClick={() => setShowAddRestaurantForm(true)}
+                        data-testid="add-restaurant-button"
+                    >
+                        <PlusCircle size={20} />
+                        Add Restaurant
                     </button>
                 )}
             </div>
@@ -266,13 +271,13 @@ const AdminDashboard = () => {
                     <UserList
                         users={getFilteredItems()}
                         onDelete={handleDeleteUser}
-                        onEdit={handleEditUser}
+                        onEdit={() => {}}
                     />
                 ) : (
                     <RestaurantList
                         restaurants={getFilteredItems()}
                         onDelete={handleDeleteRestaurant}
-                        onEdit={handleEditRestaurant}
+                        onEdit={() => {}}
                     />
                 )}
             </div>
@@ -281,7 +286,13 @@ const AdminDashboard = () => {
                 <AddUserForm
                     onClose={() => setShowAddUserForm(false)}
                     onSubmit={handleAddUser}
-                    existingRestaurants={restaurants}
+                />
+            )}
+
+            {showAddRestaurantForm && (
+                <AddRestaurantForm
+                    onClose={() => setShowAddRestaurantForm(false)}
+                    onSubmit={handleAddRestaurant}
                 />
             )}
 
